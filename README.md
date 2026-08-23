@@ -2,7 +2,7 @@
 
 A Chrome extension that blocks the sites you open on autopilot and shames you a little when you try.
 
-![icon](icon128.png)
+![icon](assets/icon128.png)
 
 ## What it does
 
@@ -30,14 +30,14 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 | `options.html/js` | block list editor |
 | `popup.html/js` | toolbar dropdown |
 | `theme.css` | shared "ink & ember" theme |
-| `icon.svg` / `icon-off.svg` | icon sources (PNGs are rasterized from these) |
+| `assets/` | icons (PNGs rasterized from the SVGs) |
 
 ## Permissions
 
-- `declarativeNetRequest` + `host_permissions` — redirect blocked navigations to the blocked page
-- `storage` — list, toggle, stats
-- `history` — suggestions on the activity page
-- `alarms` — end the 5-minute pause
+- `declarativeNetRequest` + `host_permissions` - redirect blocked navigations to the blocked page
+- `storage` - list, toggle, stats
+- `history` - suggestions on the activity page
+- `alarms` - end the 5-minute pause
 
 ## Publish
 
