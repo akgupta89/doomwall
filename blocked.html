@@ -1,0 +1,26 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Blocked</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  body{min-height:100vh;display:grid;place-items:center;padding:24px;text-align:center}
+  .k{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ember);margin-bottom:12px}
+  p{margin:0 0 8px;color:var(--mute);max-width:36ch;margin-inline:auto}
+  #line1{font-family:var(--serif);font-size:20px;color:var(--ink);margin:16px auto 8px}
+  #actions{margin-top:36px;display:flex;flex-direction:column;gap:10px;align-items:center}
+  #pause{font-size:12px} #bypass{font-size:12px} #bypass:hover{color:var(--ember2)}
+  #activity{display:block;margin-top:28px;font-size:11px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+  #activity:hover{color:var(--mute)}
+</style>
+<div>
+  <div class="k">Doomwall</div>
+  <h1>Blocked.</h1>
+  <p id="line1"></p>
+  <p id="line2"></p>
+  <div id="actions">
+    <button id="pause" class="link">I actually need this. Pause everything for 5 min.</button>
+    <button id="bypass" class="link"></button>
+  </div>
+  <a id="activity" href="activity.html">activity →</a>
+</div>
+<script src="blocked.js"></script>

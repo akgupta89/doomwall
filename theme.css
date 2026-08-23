@@ -1,0 +1,27 @@
+/* Doomwall theme — "ink & ember": near-black ink, warm paper text, ember accent */
+:root{
+  --bg:#0f0e0c; --bg2:#181613; --ink:#f3ead9; --mute:#8c8473; --dim:#4d4740; --line:#2a2622;
+  --ember:#ff5a1f; --ember2:#ff8a4c; --ok:#7bd88f;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+html{background:var(--bg);min-height:100%}
+body{min-height:100vh;color:var(--ink);font:15px/1.55 var(--sans);
+  background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,90,31,.14),transparent 60%) no-repeat var(--bg)}
+h1,h2{font-family:var(--serif);font-weight:500;letter-spacing:-.01em;margin:0}
+h1{font-size:clamp(48px,9vw,96px);line-height:.95;font-style:italic}
+h2{font-size:15px;color:var(--mute);text-transform:uppercase;letter-spacing:.12em;font-family:var(--sans);font-size:11px}
+a{color:var(--ember2)}
+b{color:var(--ink)} .muted{color:var(--mute)} .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer}
+.link{background:none;border:none;color:var(--dim);text-decoration:underline;text-underline-offset:3px;padding:0}
+.link:hover{color:var(--ink)}
+.btn{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+.btn:hover{border-color:var(--ember);color:var(--ember2)}
+.btn.primary{background:var(--ember);border-color:var(--ember);color:#100c08}
+.btn.primary:hover{background:var(--ember2);border-color:var(--ember2);color:#100c08}
+textarea{width:100%;background:var(--bg2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px;font:13px/1.6 var(--mono)}
+textarea:focus{outline:none;border-color:var(--ember)}

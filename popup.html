@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="theme.css">
+<style>
+  body{padding:10px;width:180px;background-image:none}
+  button,a{display:block;width:100%;text-align:left;background:none;border:none;color:var(--ink);padding:9px 10px;border-radius:8px;text-decoration:none;font-size:13px}
+  button:hover,a:hover{background:var(--bg2)}
+  #toggle i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--dim);vertical-align:-1px;margin-right:6px} #toggle.on i{background:var(--ember)}
+  .k{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);padding:4px 10px 6px}
+</style>
+<div class="k">Doomwall</div>
+<button id="toggle"><i></i> Blocking</button>
+<a href="activity.html" target="_blank">Activity</a>
+<a id="opts" href="#">Block list</a>
+<script src="popup.js"></script>

@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Doomwall · Activity</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  body{max-width:680px;margin:0 auto;padding:56px 20px}
+  h1{font-size:56px;margin-bottom:6px}
+  h2{margin:40px 0 12px}
+  .row{display:grid;grid-template-columns:170px 1fr 150px;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .bar{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--ember),var(--ember2));min-width:3px}
+  .n{text-align:right;color:var(--mute);font-size:13px}
+  .totals{display:flex;gap:40px;margin-top:10px} .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+  .totals .num{font-size:22px;color:var(--ink)} .totals .num small{font-size:13px;color:var(--mute)}
+  #days{display:grid;grid-template-columns:repeat(14,1fr);gap:6px;align-items:end;height:120px}
+  .day{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px;font-size:10px;color:var(--mute)}
+  .day .b{width:100%;border-radius:4px 4px 2px 2px;background:linear-gradient(180deg,var(--ember2),var(--ember));min-height:2px}
+  .day .b.zero{background:var(--line)} .day.today{color:var(--ink)}
+  .sug{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .sug span{color:var(--mute);font-size:13px;margin-left:8px}
+</style>
+<h1>Activity</h1>
+<div class="totals">
+  <div><div class="lbl">Today</div><div id="today" class="num"></div></div>
+  <div><div class="lbl">All time</div><div id="total" class="num"></div></div>
+</div>
+<h2>Last 14 days</h2>
+<div id="days"></div>
+<h2>Per site · blocks and time spent after bypass</h2>
+<div id="chart"></div>
+<h2>Suggestions · most visited, last 30 days, not on your list</h2>
+<div id="sug"></div>
+<script src="activity.js"></script>
