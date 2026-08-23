@@ -22,7 +22,7 @@ async function apply() {
   await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: old.map(r => r.id) });
   await chrome.declarativeNetRequest.updateDynamicRules({ addRules: rules });
   const active = on && !paused;
-  chrome.action.setIcon({ path: active ? { 16: "../assets/icon16.png", 32: "../assets/icon32.png", 48: "../assets/icon48.png", 128: "../assets/icon128.png" } : { 16: "../assets/icon-off16.png", 32: "../assets/icon-off32.png", 48: "../assets/icon-off48.png", 128: "../assets/icon-off128.png" } });
+  chrome.action.setIcon({ path: active ? { 16: "assets/icon16.png", 32: "assets/icon32.png", 48: "assets/icon48.png", 128: "assets/icon128.png" } : { 16: "assets/icon-off16.png", 32: "assets/icon-off32.png", 48: "assets/icon-off48.png", 128: "assets/icon-off128.png" } });
   chrome.action.setBadgeText({ text: paused ? "5m" : "" });
   chrome.action.setBadgeBackgroundColor({ color: "#ff8a4c" });
 }
