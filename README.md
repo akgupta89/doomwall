@@ -24,12 +24,12 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 
 | File | Purpose |
 |---|---|
-| `bg.js` | rules, bypass/pause logic, time tracking |
-| `blocked.html/js` | the page you land on |
-| `activity.html/js` | stats and suggestions |
-| `options.html/js` | block list editor |
-| `popup.html/js` | toolbar dropdown |
-| `theme.css` | shared "ink & ember" theme |
+| `src/bg.js` | rules, bypass/pause logic, time tracking |
+| `src/blocked.*` | the page you land on |
+| `src/activity.*` | stats and suggestions |
+| `src/options.*` | block list editor |
+| `src/popup.*` | toolbar dropdown |
+| `src/theme.css` | shared "ink & ember" theme |
 | `assets/` | icons (PNGs rasterized from the SVGs) |
 
 ## Permissions
@@ -38,11 +38,3 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 - `storage` - list, toggle, stats
 - `history` - suggestions on the activity page
 - `alarms` - end the 5-minute pause
-
-## Publish
-
-```sh
-zip -r doomwall.zip . -x '*.zip' -x '.git*' -x README.md -x '*.svg'
-```
-
-Upload at the [Chrome Web Store developer console](https://chrome.google.com/webstore/devconsole). Single purpose: block user-chosen websites. No data collected.

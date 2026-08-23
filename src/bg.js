@@ -16,13 +16,13 @@ async function apply() {
   const rules = on && !paused ? sites.map((d, i) => ({
     id: i + 1, priority: 1,
     // original URL goes in the hash: nothing in it (?, &, #) can break the redirect target
-    action: { type: "redirect", redirect: { regexSubstitution: chrome.runtime.getURL("blocked.html") + "#\\0" } },
+    action: { type: "redirect", redirect: { regexSubstitution: chrome.runtime.getURL("src/blocked.html") + "#\\0" } },
     condition: { regexFilter: `^https?://([^/]*\\.)?${esc(d)}([/?#].*)?$`, resourceTypes: ["main_frame"] }
   })) : [];
   await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: old.map(r => r.id) });
   await chrome.declarativeNetRequest.updateDynamicRules({ addRules: rules });
   const active = on && !paused;
-  chrome.action.setIcon({ path: active ? { 16: "assets/icon16.png", 32: "assets/icon32.png", 48: "assets/icon48.png", 128: "assets/icon128.png" } : { 16: "assets/icon-off16.png", 32: "assets/icon-off32.png", 48: "assets/icon-off48.png", 128: "assets/icon-off128.png" } });
+  chrome.action.setIcon({ path: active ? { 16: "../assets/icon16.png", 32: "../assets/icon32.png", 48: "../assets/icon48.png", 128: "../assets/icon128.png" } : { 16: "../assets/icon-off16.png", 32: "../assets/icon-off32.png", 48: "../assets/icon-off48.png", 128: "../assets/icon-off128.png" } });
   chrome.action.setBadgeText({ text: paused ? "5m" : "" });
   chrome.action.setBadgeBackgroundColor({ color: "#ff8a4c" });
 }
@@ -120,5 +120,5 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!on || pauseUntil > Date.now()) return;
   const site = matchSite(url, sites);
   if (!site || await grantOf(tabId)) return;
-  chrome.tabs.update(tabId, { url: chrome.runtime.getURL("blocked.html") + "#" + url });
+  chrome.tabs.update(tabId, { url: chrome.runtime.getURL("src/blocked.html") + "#" + url });
 });
