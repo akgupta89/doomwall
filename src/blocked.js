@@ -56,11 +56,11 @@ document.getElementById("pause").onclick = async () => {
   s.blocks = (s.blocks || 0) + 1;
   await chrome.storage.local.set({ count, days, stats });
   const today = day.blocked[domain], all = s.blocks;
-  // measured average for this site; 10 min until there's data
-  const perVisit = s?.visits ? Math.max(1, Math.round(s.ms / s.visits / 60000)) : 10;
+  // measured average for this site; no estimate until there's data
+  const perVisit = s?.visits && s.ms ? Math.max(1, Math.round(s.ms / s.visits / 60000)) : 0;
   document.getElementById("line1").textContent = LINES[Math.floor(Math.random() * LINES.length)].replaceAll("COUNT", count);
   document.getElementById("line2").innerHTML =
-    `<b>${domain}</b>: <b>${today}</b> ${today === 1 ? "time" : "times"} today, <b>${all}</b> all time. That's roughly <b>${fmt(all * perVisit)}</b> you got back.`;
+    `<b>${domain}</b>: <b>${today}</b> ${today === 1 ? "time" : "times"} today, <b>${all}</b> all time.${perVisit ? ` That's roughly <b>${fmt(all * perVisit)}</b> you got back.` : ""}`;
   btn.onclick = async () => {
     await chrome.runtime.sendMessage({ bypass: domain });
     location.replace(target); // replace: Back shouldn't land on this page and count again
