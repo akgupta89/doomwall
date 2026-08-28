@@ -26,6 +26,7 @@ async function render() {
   const byHost = {};
   for (const it of items) {
     try {
+      if (!/^https?:/.test(it.url)) continue;
       const h = new URL(it.url).hostname.replace(/^www\./, "");
       if (!h || sites.some(d => h === d || h.endsWith("." + d))) continue;
       byHost[h] = (byHost[h] || 0) + (it.visitCount || 1);
