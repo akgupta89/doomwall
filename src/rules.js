@@ -19,5 +19,14 @@
     if (hit.some(r => r.allow)) return null;
     return hit.find(r => !r.allow)?.host ?? null;
   };
-  globalThis.Rules = { active, matches };
+  const cleanHost = s => String(s).trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/^www\./, "");
+  const cleanPath = s => { s = String(s ?? "").trim(); return s ? "/" + s.replace(/^\/+/, "").replace(/\/+$/, "") : ""; };
+  // toRule: loose input ({site, path?, allow?, from?, to?, days?}) → stored rule. Throws on missing site.
+  const toRule = ({ site, path, allow, from, to, days }) => {
+    const host = cleanHost(site ?? ""); if (!host) throw new Error("site is required");
+    const r = { host, path: cleanPath(path), allow: !!allow };
+    if (from && to) r.window = { from, to, days: days?.length ? days : [0, 1, 2, 3, 4, 5, 6] };
+    return r;
+  };
+  globalThis.Rules = { active, matches, cleanHost, cleanPath, toRule };
 })();

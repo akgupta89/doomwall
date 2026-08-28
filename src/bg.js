@@ -6,7 +6,7 @@ const bump = (days, site, field, n) => {
 };
 importScripts("rules.js");
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const DEFAULTS = { pauseMinutes: 5, bypassLimit: 0, lines: [] };
+const DEFAULTS = { pauseMinutes: 5, bypassLimit: 0 };
 // Migrate the old `sites` list to rules once; afterwards `sites` is derived from block rules for stats/tracking.
 async function loadRules() {
   const { rules, sites = [] } = await chrome.storage.local.get(["rules", "sites"]);

@@ -23,7 +23,6 @@
   dialog::backdrop{background:rgba(0,0,0,.6)}
   .days button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:6px;padding:3px 6px;font-size:11px;cursor:pointer}
   .days button.on{border-color:var(--ember);color:var(--ember2)}
-  textarea{height:120px}
 </style>
 <h1>Rules</h1>
 <p>Block a site, a path on it, or carve out an exception. Subdomains are included.</p>
@@ -33,8 +32,6 @@
 <h2>Settings</h2>
 <div class="row"><label for="pause">Pause length</label><input id="pause" type="number" min="1" max="120" style="width:60px"> <span class="muted">min</span></div>
 <div class="row" style="margin-top:8px"><label for="limit">Bypasses per day</label><input id="limit" type="number" min="0" max="99" style="width:60px"> <span class="muted">0 = unlimited</span></div>
-<label for="lines">Guilt lines (one per line, COUNT = attempt number; blank = built-in)</label>
-<textarea id="lines"></textarea>
 <div class="foot"><button id="save" class="btn primary">Save settings</button> <span id="msg" class="muted"></span></div>
 
 <dialog id="dlg">
@@ -51,4 +48,6 @@
     <div class="foot"><button class="btn primary" value="ok">Save rule</button><button class="btn" value="cancel" formnovalidate>Cancel</button></div>
   </form>
 </dialog>
+<script src="rules.js"></script>
+<script src="webmcp.js"></script>
 <script src="options.js"></script>

@@ -7,13 +7,14 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 ## What it does
 
 - **Rules.** Block a domain, just a path on it (`youtube.com/shorts`), or carve out an exception (`reddit.com/r/programming`). Optionally only during a time window on chosen days. Subdomains are included.
-- **Settings.** Pause length, bypasses per day, your own guilt lines.
+- **Settings.** Pause length and bypasses per day.
 - **Blocked page.** A guilt line, how many times you tried today and overall, and roughly how much time you got back.
 - **Bypass.** One tab gets through when you admit you have no self-control. Links opened from it work too.
 - **Pause.** Turn everything off for 5 minutes when you actually need a site.
 - **Activity.** Daily and all-time numbers, a 14-day chart, time spent per site, and suggestions from your browsing history.
 - **Toggle.** One click in the toolbar. Ember icon means blocking, grey means off.
 - **Private.** Everything stays in your browser. No accounts, no servers, no background process.
+- **Agent-ready.** Exposes its controls as [WebMCP](WEBMCP.md) tools for in-browser agents and scripts.
 
 ## Install (unpacked)
 
@@ -29,6 +30,7 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 | `src/blocked.*` | the page you land on |
 | `src/activity.*` | stats and suggestions |
 | `src/rules.js` | rule matching (shared by bg + tests) |
+| `src/webmcp.js` | WebMCP tools, see [WEBMCP.md](WEBMCP.md) |
 | `src/options.*` | rule builder + settings |
 | `test/rules.test.js` | `node test/rules.test.js` |
 | `src/popup.*` | toolbar dropdown |

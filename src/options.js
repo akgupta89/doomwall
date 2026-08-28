@@ -1,8 +1,7 @@
 const $ = id => document.getElementById(id);
 const STARTERS = ["x.com", "twitter.com", "instagram.com", "facebook.com", "tiktok.com", "reddit.com", "youtube.com", "linkedin.com", "threads.net", "snapchat.com"];
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const cleanHost = s => s.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "").replace(/^www\./, "");
-const cleanPath = s => { s = s.trim(); return s ? "/" + s.replace(/^\/+/, "").replace(/\/+$/, "") : ""; };
+const { cleanHost, cleanPath } = Rules;
 let rules = [], editing = -1;
 
 const when = r => r.window ? `${r.window.from}–${r.window.to} ${r.window.days.length === 7 ? "daily" : r.window.days.map(d => DAYS[d]).join(" ")}` : "";
@@ -47,7 +46,7 @@ $("dlg").onclose = () => {
 
 // Settings
 $("save").onclick = async () => {
-  const settings = { pauseMinutes: +$("pause").value || 5, bypassLimit: +$("limit").value || 0, lines: $("lines").value.split("\n").map(s => s.trim()).filter(Boolean) };
+  const settings = { pauseMinutes: +$("pause").value || 5, bypassLimit: +$("limit").value || 0 };
   await chrome.storage.local.set({ settings });
   $("msg").textContent = "Saved";
 };
@@ -56,5 +55,5 @@ chrome.storage.local.get(["rules", "sites", "settings"]).then(({ rules: r, sites
   // first run: prefill common sites so they're right there to trim
   rules = r ?? (sites?.length ? sites : STARTERS).map(host => ({ host, path: "", allow: false }));
   if (!r) save(); else render();
-  $("pause").value = settings.pauseMinutes ?? 5; $("limit").value = settings.bypassLimit ?? 0; $("lines").value = (settings.lines ?? []).join("\n");
+  $("pause").value = settings.pauseMinutes ?? 5; $("limit").value = settings.bypassLimit ?? 0;
 });

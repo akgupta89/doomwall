@@ -1,6 +1,6 @@
 const assert = require("assert");
 require("../src/rules.js");
-const { matches, active } = globalThis.Rules;
+const { matches, active, cleanHost, cleanPath, toRule } = globalThis.Rules;
 
 const R = (host, o = {}) => ({ host, path: "", allow: false, ...o });
 const mon10 = new Date(2026, 7, 31, 10, 0); // Monday 10:00 local
@@ -27,4 +27,12 @@ assert.equal(matches("https://x.com/home", rules, mon10), "x.com");
 assert.equal(matches("https://x.com/home", rules, sat10), null);
 assert.equal(matches("https://notreddit.com/", rules, mon10), null);
 assert.equal(matches("not a url", rules, mon10), null);
+// cleaners (shared by options UI and WebMCP tools)
+assert.equal(cleanHost(" https://WWW.Reddit.com/r/x "), "reddit.com");
+assert.equal(cleanPath(" r/programming/ "), "/r/programming");
+assert.equal(cleanPath(""), "");
+assert.deepEqual(toRule({ site: "YouTube.com", path: "shorts" }), { host: "youtube.com", path: "/shorts", allow: false });
+assert.deepEqual(toRule({ site: "x.com", allow: true, from: "09:00", to: "18:00", days: [1, 2] }), { host: "x.com", path: "", allow: true, window: { from: "09:00", to: "18:00", days: [1, 2] } });
+assert.deepEqual(toRule({ site: "x.com", from: "09:00", to: "18:00" }).window.days, [0, 1, 2, 3, 4, 5, 6]);
+assert.throws(() => toRule({ site: "" }), /site/);
 console.log("ok");
