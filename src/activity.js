@@ -37,7 +37,8 @@ async function render() {
     : `<p class="muted">${err ? "History access failed: " + err + " — remove and re-add the extension." : `Nothing to suggest (${items.length} history entries scanned).`}</p>`;
   el("sug").onclick = async e => {
     const h = e.target.dataset.h; if (!h) return;
-    await chrome.storage.local.set({ sites: [...sites, h] });
+    const { rules = [] } = await chrome.storage.local.get("rules");
+    await chrome.storage.local.set({ rules: [...rules, { host: h, path: "", allow: false }] });
     render();
   };
 }

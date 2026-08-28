@@ -6,7 +6,8 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 
 ## What it does
 
-- **Block list.** Add the domains you open without thinking. Subdomains are included.
+- **Rules.** Block a domain, just a path on it (`youtube.com/shorts`), or carve out an exception (`reddit.com/r/programming`). Optionally only during a time window on chosen days. Subdomains are included.
+- **Settings.** Pause length, bypasses per day, your own guilt lines.
 - **Blocked page.** A guilt line, how many times you tried today and overall, and roughly how much time you got back.
 - **Bypass.** One tab gets through when you admit you have no self-control. Links opened from it work too.
 - **Pause.** Turn everything off for 5 minutes when you actually need a site.
@@ -18,7 +19,7 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 
 1. Clone this repo.
 2. `chrome://extensions` → enable **Developer mode** → **Load unpacked** → pick the folder.
-3. Click the toolbar icon → **Block list** → edit → **Save**.
+3. Click the toolbar icon → **Rules** → **Add rule**.
 
 ## Files
 
@@ -27,7 +28,9 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 | `src/bg.js` | rules, bypass/pause logic, time tracking |
 | `src/blocked.*` | the page you land on |
 | `src/activity.*` | stats and suggestions |
-| `src/options.*` | block list editor |
+| `src/rules.js` | rule matching (shared by bg + tests) |
+| `src/options.*` | rule builder + settings |
+| `test/rules.test.js` | `node test/rules.test.js` |
 | `src/popup.*` | toolbar dropdown |
 | `src/theme.css` | shared "ink & ember" theme |
 | `assets/` | icons (PNGs rasterized from the SVGs) |
@@ -37,4 +40,4 @@ A Chrome extension that blocks the sites you open on autopilot and shames you a 
 - `declarativeNetRequest` + `host_permissions` - redirect blocked navigations to the blocked page
 - `storage` - list, toggle, stats
 - `history` - suggestions on the activity page
-- `alarms` - end the 5-minute pause
+- `alarms` - end the pause, re-check time-windowed rules each minute

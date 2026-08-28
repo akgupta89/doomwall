@@ -4,38 +4,52 @@ const bump = (days, site, field, n) => {
   d[field] += n;
   if (site) d.sites[site] = (d.sites[site] || 0) + (field === "ms" ? n : 0);
 };
+importScripts("rules.js");
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const matchSite = (url, sites) => {
-  try { const h = new URL(url).hostname; return sites.find(d => h === d || h.endsWith("." + d)) || null; } catch { return null; }
-};
+const DEFAULTS = { pauseMinutes: 5, bypassLimit: 0, lines: [] };
+// Migrate the old `sites` list to rules once; afterwards `sites` is derived from block rules for stats/tracking.
+async function loadRules() {
+  const { rules, sites = [] } = await chrome.storage.local.get(["rules", "sites"]);
+  if (rules) return rules;
+  const r = sites.map(host => ({ host, path: "", allow: false }));
+  if (r.length) await chrome.storage.local.set({ rules: r }); // empty: leave unset so options can prefill starters
+  return r;
+}
+const matchSite = (url, rules) => Rules.matches(url, rules);
 
 async function apply() {
-  const { on = true, sites = [], pauseUntil = 0 } = await chrome.storage.local.get(["on", "sites", "pauseUntil"]);
+  const { on = true, pauseUntil = 0 } = await chrome.storage.local.get(["on", "pauseUntil"]);
+  const all = await loadRules();
+  const sites = [...new Set(all.filter(r => !r.allow).map(r => r.host))];
+  await chrome.storage.local.set({ sites });
   const paused = pauseUntil > Date.now();
   const old = await chrome.declarativeNetRequest.getDynamicRules();
-  const rules = on && !paused ? sites.map((d, i) => ({
-    id: i + 1, priority: 1,
+  const rules = on && !paused ? all.filter(r => Rules.active(r)).map((r, i) => ({
+    id: i + 1, priority: r.allow ? 2 : 1,
     // original URL goes in the hash: nothing in it (?, &, #) can break the redirect target
-    action: { type: "redirect", redirect: { regexSubstitution: chrome.runtime.getURL("src/blocked.html") + "#\\0" } },
-    condition: { regexFilter: `^https?://([^/]*\\.)?${esc(d)}([/?#].*)?$`, resourceTypes: ["main_frame"] }
+    action: r.allow ? { type: "allow" } : { type: "redirect", redirect: { regexSubstitution: chrome.runtime.getURL("src/blocked.html") + "#\\0" } },
+    condition: { regexFilter: `^https?://([^/]*\\.)?${esc(r.host)}${r.path ? esc(r.path.replace(/\/$/, "")) + "([/?#].*)?" : "([/?#].*)?"}$`, resourceTypes: ["main_frame"] }
   })) : [];
+  // time windows: re-evaluate every minute so rules switch on/off
+  if (all.some(r => r.window)) chrome.alarms.create("tick", { periodInMinutes: 1 }); else chrome.alarms.clear("tick");
   await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: old.map(r => r.id) });
   await chrome.declarativeNetRequest.updateDynamicRules({ addRules: rules });
   const active = on && !paused;
   chrome.action.setIcon({ path: active ? { 16: "/assets/icon16.png", 32: "/assets/icon32.png", 48: "/assets/icon48.png", 128: "/assets/icon128.png" } : { 16: "/assets/icon-off16.png", 32: "/assets/icon-off32.png", 48: "/assets/icon-off48.png", 128: "/assets/icon-off128.png" } });
-  chrome.action.setBadgeText({ text: paused ? "5m" : "" });
+  const { settings = {} } = await chrome.storage.local.get("settings");
+  chrome.action.setBadgeText({ text: paused ? `${settings.pauseMinutes ?? DEFAULTS.pauseMinutes}m` : "" });
   chrome.action.setBadgeBackgroundColor({ color: "#ff8a4c" });
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
-  const cur = await chrome.storage.local.get(["on", "sites"]);
-  await chrome.storage.local.set({ on: cur.on ?? true, sites: cur.sites ?? [] });
-  apply();
-  if (!cur.sites) chrome.runtime.openOptionsPage();
+  const cur = await chrome.storage.local.get(["on", "sites", "rules"]);
+  await chrome.storage.local.set({ on: cur.on ?? true });
+  await apply();
+  if (!cur.sites && !cur.rules) chrome.runtime.openOptionsPage();
 });
 chrome.runtime.onStartup.addListener(apply);
 chrome.alarms.onAlarm.addListener(apply);
-chrome.storage.onChanged.addListener((c, area) => { if (area === "local" && (c.sites || c.on || c.pauseUntil)) apply(); });
+chrome.storage.onChanged.addListener((c, area) => { if (area === "local" && (c.rules || c.on || c.pauseUntil)) apply(); });
 
 // Per-tab bypass: a session "allow" rule scoped to that tab. Gone when the tab closes.
 const grant = (tabId, domain) => chrome.declarativeNetRequest.updateSessionRules({
@@ -52,7 +66,9 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
   if (!sender.tab) return;
   (async () => {
     if (msg.bypass) {
-      const { stats = {}, days = {} } = await chrome.storage.local.get(["stats", "days"]);
+      const { stats = {}, days = {}, settings = {} } = await chrome.storage.local.get(["stats", "days", "settings"]);
+      const limit = settings.bypassLimit ?? DEFAULTS.bypassLimit;
+      if (limit && (days[dayKey()]?.visits ?? 0) >= limit) return reply(false);
       stats[msg.bypass] = stats[msg.bypass] || { ms: 0, visits: 0 };
       stats[msg.bypass].visits++;
       bump(days, msg.bypass, "visits", 1);
@@ -60,7 +76,8 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
       await grant(sender.tab.id, msg.bypass);
       reply(true);
     } else if (msg.pause) {
-      const until = Date.now() + 5 * 60000;
+      const { settings = {} } = await chrome.storage.local.get("settings");
+      const until = Date.now() + (settings.pauseMinutes ?? DEFAULTS.pauseMinutes) * 60000;
       await chrome.storage.local.set({ pauseUntil: until });
       chrome.alarms.create("unpause", { when: until });
       reply(true);
@@ -79,12 +96,13 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
 async function track() {
   const now = Date.now();
   const { open } = await chrome.storage.session.get("open");
-  const { sites = [], stats = {}, days = {} } = await chrome.storage.local.get(["sites", "stats", "days"]);
+  const { stats = {}, days = {} } = await chrome.storage.local.get(["stats", "days"]);
+  const rules = await loadRules();
   let cur = null;
   const win = await chrome.windows.getLastFocused().catch(() => null);
   if (win?.focused) {
     const [tab] = await chrome.tabs.query({ active: true, windowId: win.id });
-    cur = tab?.url ? matchSite(tab.url, sites) : null;
+    cur = tab?.url ? matchSite(tab.url, rules) : null;
   }
   if (open && open.site !== cur) {
     stats[open.site] = stats[open.site] || { ms: 0, visits: 0 };
@@ -116,9 +134,9 @@ chrome.tabs.onCreated.addListener(async tab => {
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   const url = info.url || (info.status === "loading" && tab.url);
   if (!url || !/^https?:/.test(url)) return;
-  const { on = true, sites = [], pauseUntil = 0 } = await chrome.storage.local.get(["on", "sites", "pauseUntil"]);
+  const { on = true, pauseUntil = 0 } = await chrome.storage.local.get(["on", "pauseUntil"]);
   if (!on || pauseUntil > Date.now()) return;
-  const site = matchSite(url, sites);
+  const site = matchSite(url, await loadRules());
   if (!site || await grantOf(tabId)) return;
   chrome.tabs.update(tabId, { url: chrome.runtime.getURL("src/blocked.html") + "#" + url });
 });

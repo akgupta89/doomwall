@@ -43,7 +43,8 @@ document.getElementById("pause").onclick = async () => {
   if (document.prerendering) await new Promise(r => document.addEventListener("prerenderingchange", r, { once: true }));
   // opened from a bypassed tab (new-tab links, redirect hops)? go straight through
   if (target && await chrome.runtime.sendMessage({ inherit: true })) return location.replace(target);
-  let { count = 0, stats = {}, sites = [], days = {} } = await chrome.storage.local.get(["count", "stats", "sites", "days"]);
+  let { count = 0, stats = {}, sites = [], days = {}, settings = {} } = await chrome.storage.local.get(["count", "stats", "sites", "days", "settings"]);
+  const lines = settings.lines?.length ? settings.lines : LINES;
   count++;
   const host = target ? new URL(target).hostname : "";
   const domain = sites.find(d => host === d || host.endsWith("." + d)) || host;
@@ -58,11 +59,14 @@ document.getElementById("pause").onclick = async () => {
   const today = day.blocked[domain], all = s.blocks;
   // measured average for this site; no estimate until there's data
   const perVisit = s?.visits && s.ms ? Math.max(1, Math.round(s.ms / s.visits / 60000)) : 0;
-  document.getElementById("line1").textContent = LINES[Math.floor(Math.random() * LINES.length)].replaceAll("COUNT", count);
+  document.getElementById("line1").textContent = lines[Math.floor(Math.random() * lines.length)].replaceAll("COUNT", count);
+  const limit = settings.bypassLimit ?? 0, used = day.visits ?? 0;
+  if (limit && used >= limit) { btn.textContent = `No bypasses left today (${limit}/${limit} used)`; btn.disabled = true; }
+  else if (limit) btn.textContent += ` (${limit - used} left today)`;
   document.getElementById("line2").innerHTML =
     `<b>${domain}</b>: <b>${today}</b> ${today === 1 ? "time" : "times"} today, <b>${all}</b> all time.${perVisit ? ` That's roughly <b>${fmt(all * perVisit)}</b> you got back.` : ""}`;
   btn.onclick = async () => {
-    await chrome.runtime.sendMessage({ bypass: domain });
+    if (!await chrome.runtime.sendMessage({ bypass: domain })) return location.reload();
     location.replace(target); // replace: Back shouldn't land on this page and count again
   };
 })();
