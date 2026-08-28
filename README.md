@@ -1,6 +1,6 @@
 # Doomwall
 
-A Chrome extension that blocks the sites you open on autopilot and shames you a little when you try.
+A Chrome extension that blocks the sites you keep opening and shames you a little when you try.
 
 ![icon](assets/icon128.png)
 
